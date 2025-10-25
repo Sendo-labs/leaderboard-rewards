@@ -1,0 +1,83 @@
+name: Security Audit
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 0 * * 0'
+
+jobs:
+  anchor-security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+      
+      - name: Setup Solana
+        run: |
+          sh -c "$(curl -sSfL https://release.solana.com/stable/install)"
+          echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
+      
+      - name: Setup Anchor
+        run: |
+          cargo install --git https://github.com/coral-xyz/anchor --tag v0.31.1 anchor-cli --locked
+      
+      - name: Build Anchor program
+        run: anchor build
+      
+      - name: Run Anchor verify-build (if possible)
+        run: |
+          if command -v anchor verify-build &> /dev/null; then
+            anchor verify-build
+          else
+            echo "Anchor verify-build not available, skipping"
+          fi
+        continue-on-error: true
+
+  dependency-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Audit Rust dependencies
+        uses: actions-rs/audit-check@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+      
+      - name: Install oracle-bot dependencies
+        working-directory: oracle-bot
+        run: bun install
+      
+      - name: Audit npm dependencies
+        working-directory: oracle-bot
+        run: npm audit --audit-level=moderate || true
+
+  code-scan:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript, typescript
+      
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+
