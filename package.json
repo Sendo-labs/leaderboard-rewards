@@ -1,0 +1,38 @@
+{
+  "name": "leaderboard-rewards",
+  "version": "1.0.0",
+  "description": "Solana Anchor program for rewarding contributors based on leaderboard XP",
+  "license": "MIT",
+  "scripts": {
+    "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w",
+    "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check",
+    "build": "anchor build",
+    "test": "anchor test",
+    "deploy:devnet": "anchor deploy --provider.cluster devnet",
+    "deploy:mainnet": "anchor deploy --provider.cluster mainnet",
+    "init:devnet": "tsx scripts/initialize.ts devnet",
+    "init:mainnet": "tsx scripts/initialize.ts mainnet",
+    "fund": "tsx scripts/fund-usdc.ts",
+    "claim-sbt": "tsx scripts/claim-sbt.ts",
+    "create-epoch": "tsx scripts/create-epoch.ts",
+    "keys:sync": "anchor keys sync"
+  },
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.31.1",
+    "@solana/spl-token": "^0.4.9",
+    "@solana/web3.js": "^1.95.8",
+    "bs58": "^6.0.0"
+  },
+  "devDependencies": {
+    "@types/bn.js": "^5.1.0",
+    "@types/chai": "^4.3.0",
+    "@types/mocha": "^9.0.0",
+    "@types/node": "^22.10.5",
+    "chai": "^4.3.4",
+    "mocha": "^9.0.3",
+    "prettier": "^2.6.2",
+    "ts-mocha": "^10.0.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  }
+}

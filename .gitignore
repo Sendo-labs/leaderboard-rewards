@@ -1,0 +1,70 @@
+# Anchor
+.anchor
+target/
+!target/deploy/
+!target/idl/
+**/*.rs.bk
+node_modules
+test-ledger
+
+# Solana
+.DS_Store
+*.so
+*.swp
+
+# IDL & Types
+!target/types/
+
+# Dependencies
+node_modules/
+package-lock.json
+bun.lock
+yarn.lock
+
+# Oracle Bot
+oracle-bot/dist/
+oracle-bot/node_modules/
+oracle-bot/.env
+oracle-bot/*.log
+
+# Keys (IMPORTANT: Never commit private keys!)
+keys/*.json
+!keys/.gitkeep
+*.keypair
+*-keypair.json
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+oracle-bot.log
+
+# Build
+dist/
+build/
+out/
+
+# Testing
+.nyc_output/
+coverage/
+
+# Misc
+.cache/
+tmp/
+temp/
+keys/

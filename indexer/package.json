@@ -1,0 +1,26 @@
+{
+  "name": "leaderboard-rewards-indexer",
+  "version": "1.0.0",
+  "description": "Event indexer for Leaderboard Rewards - tracks XP sync events",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts"
+  },
+  "keywords": ["solana", "indexer", "leaderboard"],
+  "author": "Sendo Labs",
+  "license": "MIT",
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.30.1",
+    "@solana/web3.js": "^1.95.7",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}
+

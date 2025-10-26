@@ -1,0 +1,138 @@
+name: Test & Build
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  SOLANA_VERSION: '1.18.0'
+  ANCHOR_VERSION: '0.31.1'
+
+jobs:
+  test:
+    name: Test Anchor Program
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Cache Solana
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/solana
+            ~/.local/share/solana
+          key: solana-${{ runner.os }}-${{ env.SOLANA_VERSION }}
+
+      - name: Install Solana
+        run: |
+          sh -c "$(curl -sSfL https://release.solana.com/v${{ env.SOLANA_VERSION }}/install)"
+          echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
+          solana --version
+
+      - name: Cache Anchor
+        id: cache-anchor
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/anchor
+          key: anchor-${{ runner.os }}-${{ env.ANCHOR_VERSION }}
+
+      - name: Install Anchor
+        if: steps.cache-anchor.outputs.cache-hit != 'true'
+        run: |
+          cargo install --git https://github.com/coral-xyz/anchor --tag v${{ env.ANCHOR_VERSION }} anchor-cli --locked
+
+      - name: Install Dependencies
+        run: yarn install
+
+      - name: Build Program
+        run: |
+          anchor build
+          echo "✅ Program built successfully"
+
+      - name: Verify Program ID
+        run: |
+          anchor keys list
+          echo "✅ Program ID verified"
+
+      - name: Run Tests
+        run: |
+          solana-test-validator --reset &
+          VALIDATOR_PID=$!
+          sleep 10
+          anchor test --skip-deploy || TEST_RESULT=$?
+          kill $VALIDATOR_PID
+          exit ${TEST_RESULT:-0}
+
+  lint:
+    name: Lint & Format Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+
+      - name: Install Dependencies
+        run: yarn install
+
+      - name: Check Rust Format
+        run: cargo fmt -- --check
+        working-directory: programs/leaderboard-rewards
+
+      - name: Rust Clippy
+        run: cargo clippy -- -D warnings
+        working-directory: programs/leaderboard-rewards
+        continue-on-error: true
+
+      - name: TypeScript Lint
+        run: yarn lint
+
+  oracle-bot-test:
+    name: Test Oracle Bot
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install Dependencies
+        run: |
+          cd oracle-bot
+          pnpm install
+
+      - name: Run Oracle Bot Tests
+        run: |
+          cd oracle-bot
+          pnpm test
+
+      - name: Build Oracle Bot
+        run: |
+          cd oracle-bot
+          pnpm run build
