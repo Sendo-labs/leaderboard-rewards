@@ -5,7 +5,7 @@ use anchor_spl::{
     token_2022::{mint_to, MintTo, Token2022},
 };
 
-declare_id!("HHU31ZnG6NrdXYLseioh5hhDwBX1Zwmv2nyrfiC46yHc");
+declare_id!("GQ36eQ5oN6A47q7SpZFYGAA3HndkELmjdgsncbN1yQ9d");
 
 const MAX_GITHUB_USERNAME_LEN: usize = 39;
 const SECONDS_PER_WEEK: i64 = 7 * 24 * 60 * 60;
