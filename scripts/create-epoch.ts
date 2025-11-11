@@ -1,5 +1,5 @@
 import * as anchor from '@coral-xyz/anchor';
-import { Program, BN } from '@coral-xyz/anchor';
+import { Program, BN, AnchorProvider } from '@coral-xyz/anchor';
 import { 
   Connection, 
   PublicKey,
@@ -82,7 +82,7 @@ async function createEpoch() {
   console.log(`  Epoch Number: ${epoch.epochNumber}`);
   console.log(`  Start Time: ${new Date(epoch.startTime.toNumber() * 1000).toISOString()}`);
   console.log(`  End Time: ${new Date(epoch.endTime.toNumber() * 1000).toISOString()}`);
-  console.log(`  Reward Amount: ${epoch.rewardAmount.toString()}`);
+  console.log(`  Reward Amount: ${epoch.usdcRewardAmount.toString()}`);
   console.log(`  Total XP: ${epoch.totalXp.toString()}`);
   console.log(`  Contributors: ${epoch.contributorCount}`);
   console.log(`  Finalized: ${epoch.finalized}`);
